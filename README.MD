@@ -37,10 +37,16 @@ O script acessa a página da ANS, analisa o HTML e identifica os links que conte
 
 ### Como executar
 
-Dentro da pasta `teste-01`, execute o script com:
+1. Instale as dependências necessárias:
 
 ```bash
-python main.py
+pip install requests beautifulsoup4
+```
+
+2. Dentro da pasta `teste-01`, execute o script com:
+
+```bash
+python scraper.py
 ```
 
 ## O arquivo `anexos.zip` será criado na pasta `arquivos/`.
@@ -49,7 +55,35 @@ python main.py
 
 ## Teste 2 – Transformação de Dados
 
-_(Em desenvolvimento)_
+O script lê o Anexo I em PDF, extrai a tabela de procedimentos e gera um CSV com os dados tratados. Em seguida, o CSV é compactado em um arquivo `.zip`.
+
+### O que o script faz:
+
+- Abre o PDF do Anexo I e percorre todas as páginas com `pdfplumber`
+- Extrai as tabelas visuais detectadas no documento usando `extract_tables`
+- Substitui automaticamente as siglas "OD" e "AMB" por descrições completas usando a função `substituir(c)`
+- Organiza os dados extraídos em uma lista de listas
+- Salva o conteúdo em um arquivo `.csv` com `csv.writer`
+- Compacta o `.csv` em um `.zip` com `zipfile.ZipFile`
+- Exibe no terminal a quantidade total de linhas extraídas e o caminho final do `.zip`
+
+### Como executar
+
+1. Instale a dependência necessária:
+
+```bash
+pip install pdfplumber
+```
+
+2. Dentro da pasta `teste-02`, execute o script com:
+
+```bash
+python transformador.py
+```
+
+## O arquivo `Teste_Gabriel_Santos_Trindade.zip` será criado na pasta `arquivos/`.
+
+---
 
 ## Teste 3 – Banco de Dados
 
