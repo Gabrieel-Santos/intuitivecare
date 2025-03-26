@@ -87,7 +87,66 @@ python transformador.py
 
 ## Teste 3 – Banco de Dados
 
-_(Em desenvolvimento)_
+Foram utilizadas bases de dados da ANS em formato `.csv`, referentes às despesas trimestrais de operadoras de saúde e aos dados cadastrais das operadoras. Com base nesses dados, foi realizada a estruturação do banco em PostgreSQL, importação dos dados e execução de duas consultas analíticas.
+
+### O que os scripts fazem:
+
+- `create_tables.sql`:  
+  Cria a estrutura do banco de dados com duas tabelas:
+
+  - `despesas_trimestrais`, contendo os dados trimestrais de despesas por operadora
+  - `relatorio_cadop`, contendo os dados cadastrais das operadoras com base no CSV original
+
+- `import_data.sql`:  
+  Realiza a importação dos arquivos `.csv` para as tabelas criadas, usando `\copy` com `DELIMITER ';'` e `ENCODING 'UTF8'`.  
+  Todos os arquivos trimestrais de 2023 e 2024 são carregados em `despesas_trimestrais`, enquanto o `Relatorio_cadop.csv` é carregado em `relatorio_cadop`.
+
+- `consultas_analiticas.sql`:  
+  Contém duas queries SQL analíticas que somam as despesas médicas da categoria `"SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR"`, ordenando as 10 operadoras com maiores valores:
+  - A primeira considera apenas o 4º trimestre de 2024 (`data >= '2024-10-01'`)
+  - A segunda considera todo o ano de 2024 (`data >= '2024-01-01'`)
+    Ambas utilizam `REPLACE(..., ',', '.')::NUMERIC` para tratar corretamente os valores numéricos com vírgula.
+
+### Como executar
+
+1. Instale as dependências necessárias:
+
+```bash
+sudo apt install postgresql postgresql-contrib
+```
+
+2. Crie o banco de dados no PostgreSQL:
+
+```sql
+CREATE DATABASE intuitivecare;
+```
+
+3. Rode os arquivos SQL:
+
+```bash
+sudo -u postgres psql -d intuitivecare -f create_tables.sql
+sudo -u postgres psql -d intuitivecare -f import_data.sql
+sudo -u postgres psql -d intuitivecare -f consultas_analiticas.sql
+```
+
+### Resultado da análise
+
+Consulta referente ao último trimestre (4T2024), filtrando por "SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR":
+
+```
+ reg_ans | total_despesa
+---------+---------------------
+    5711 | 23516487489.97
+    6246 | 15698180049.08
+  326305 | 15400708697.86
+  359017 |  7209059967.55
+  368253 |  5902558128.55
+  346659 |  5542848031.98
+  339679 |  5192114791.45
+  302147 |  4434353000.89
+  343889 |  3915933905.41
+     701 |  3548029528.89
+```
 
 ## Teste 4 – API
 
