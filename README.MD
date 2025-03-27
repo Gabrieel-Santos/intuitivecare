@@ -1,4 +1,4 @@
-# Testes de Nivelamento - IntuitiveCare
+# Testes de Nivelamento – IntuitiveCare
 
 ## Índice
 
@@ -102,7 +102,7 @@ Foram utilizadas bases de dados da ANS em formato `.csv`, referentes às despesa
   Todos os arquivos trimestrais de 2023 e 2024 são carregados em `despesas_trimestrais`, enquanto o `Relatorio_cadop.csv` é carregado em `relatorio_cadop`.
 
 - `consultas_analiticas.sql`:  
-  Contém duas queries SQL analíticas que somam as despesas médicas da categoria `"SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR"`, ordenando as 10 operadoras com maiores valores:
+  Contém duas queries SQL analíticas que somam as despesas médicas da categoria `"EVENTOS/ SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR"`, ordenando as 10 operadoras com maiores valores:
   - A primeira considera apenas o 4º trimestre de 2024 (`data >= '2024-10-01'`)
   - A segunda considera todo o ano de 2024 (`data >= '2024-01-01'`)
     Ambas utilizam `REPLACE(..., ',', '.')::NUMERIC` para tratar corretamente os valores numéricos com vírgula.
@@ -150,4 +150,71 @@ Consulta referente ao último trimestre (4T2024), filtrando por "SINISTROS CONHE
 
 ## Teste 4 – API
 
-_(Em desenvolvimento)_
+Foi desenvolvida uma aplicação completa com **frontend em Vue.js** e **backend em FastAPI**, que realiza buscas textuais no cadastro de operadoras (baseado no `Relatorio_cadop.csv` do teste 3.2).
+
+### Backend
+
+- O backend está localizado em `teste-04/backend/` e utiliza **FastAPI** com **pandas** para leitura e filtragem dos dados.
+- O arquivo `main.py` carrega o CSV na inicialização usando `pd.read_csv()` com `sep=";"`, `encoding="utf-8"` e `dtype=str`, garantindo compatibilidade com os dados e evitando erros de parsing.
+- A API define uma rota `/buscar` via `@app.get`, com o parâmetro `q` usando validação do `fastapi.Query(min_length=2)`.
+- A busca textual é feita com `str.contains()` (case-insensitive), comparando o termo com os campos `Razao_Social` e `Nome_Fantasia`.
+- Os **registros mais relevantes** são considerados como os **primeiros resultados encontrados na base**, com correspondência parcial no nome ou razão social — o critério de ordenação neste caso é a ordem natural do dataset, retornando até 10 registros via `.head(10)`.
+- O retorno é formatado como uma lista de dicionários com `.to_dict(orient="records")`, compatível com JSON.
+- A aplicação habilita o CORS com `CORSMiddleware` para permitir acesso entre o frontend (Vercel) e o backend (Render).
+- Também foi criada uma **coleção Postman** com uma requisição `GET` de exemplo (`/buscar?q=amil`) para validar a API visualmente.
+
+### Frontend
+
+- O frontend está localizado em `teste-04/frontend/` e foi desenvolvido com **Vue 3 + Vite**.
+- O componente principal realiza a busca conforme o usuário digita (`@input="buscar"`) e atualiza os resultados em tempo real.
+- A biblioteca **Axios** é usada para comunicação HTTP com a API.
+- A interface foi construída com **Tailwind CSS**, utilizando classes como `rounded-xl`, `shadow-md`, `divide-y` e `transition`, garantindo estilo moderno, leve e responsivo.
+- Os resultados são exibidos dinamicamente com `v-for`, com controle de carregamento (`v-if="carregando"`) e mensagem de erro amigável quando não há correspondência.
+- O componente adapta-se bem a diferentes tamanhos de tela, seguindo o padrão **mobile first**.
+
+### Como executar localmente
+
+Para testar a aplicação localmente:
+
+1. No backend (`teste-04/backend`), instale as dependências:
+
+```bash
+pip install fastapi uvicorn pandas
+```
+
+2. Inicie a API:
+
+```bash
+uvicorn main:app --reload
+```
+
+A API estará disponível em `http://127.0.0.1:8000`.
+
+3. No frontend (`teste-04/frontend`), instale as dependências e rode o servidor de desenvolvimento:
+
+```bash
+npm install
+npm run dev
+```
+
+> **Importante:** Para testes locais, altere a URL da API no componente Vue (arquivo `OperadoraBusca.vue`) de:
+
+```js
+https://fastapi-intuitivecare.onrender.com/buscar
+```
+
+para:
+
+```js
+http://127.0.0.1:8000/buscar
+```
+
+### Deploy
+
+A aplicação está publicada online, utilizando:
+
+- **Frontend (Vercel)**  
+  [https://intuitivecare-gabriel.vercel.app](https://intuitivecare-gabriel.vercel.app)
+
+- **API (Render)**  
+  [https://fastapi-intuitivecare.onrender.com](https://fastapi-intuitivecare.onrender.com)
