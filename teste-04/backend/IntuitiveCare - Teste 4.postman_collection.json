@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "185fb336-bf34-4269-91d7-610812dcce1e",
+		"name": "IntuitiveCare - Teste 4",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32899180"
+	},
+	"item": [
+		{
+			"name": "Buscar operadoras",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/buscar?q=amil",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"buscar"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "amil"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
