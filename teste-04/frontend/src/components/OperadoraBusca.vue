@@ -57,7 +57,7 @@
   
         try {
           const response = await axios.get(
-            `http://127.0.0.1:8000/buscar?q=${this.busca}`
+            `https://fastapi-intuitivecare.onrender.com/buscar?q=${this.busca}`
           );
           this.resultados = response.data;
         } catch (error) {
